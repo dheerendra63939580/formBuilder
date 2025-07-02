@@ -147,8 +147,8 @@ const TemplateBuilder = () => {
             <div className="flex-grow flex space-x-6">
                 <Sidebar onAddField={(type) => {}} /> {/* no-op, moved into FormCanvas now */}
 
-                <div className="flex-grow flex flex-col bg-white rounded-lg shadow-xl p-6">
-                    <div className="mb-6 flex justify-between items-center">
+                <div className="flex-grow flex flex-col bg-white rounded-lg shadow-xl p-6 relative">
+                    <div className="mb-6 flex">
                         <div className="flex-grow">
                             <label htmlFor="templateName" className="block text-lg font-medium text-gray-700 mb-2">Template Name</label>
                             <input
@@ -162,7 +162,7 @@ const TemplateBuilder = () => {
                         </div>
                         <button
                             onClick={() => setIsSectionEditorOpen(true)}
-                            className="ml-4 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700"
+                            className="ml-4 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700 absolute right-6 top-3"
                         >
                             + Add Section
                         </button>
