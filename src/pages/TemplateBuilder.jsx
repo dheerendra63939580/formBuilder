@@ -1,20 +1,23 @@
-// src/pages/TemplateBuilder.jsx
+// Updated: src/pages/TemplateBuilder.jsx
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { generateUniqueId } from '../utils/helper.js'; // Updated extension
+import { generateUniqueId } from '../utils/helper.js';
 import Modal from './Modal.jsx';
 import FieldEditor from './FieldEditor.jsx';
 import Sidebar from './Sidebar.jsx';
 import FormCanvas from './FormCanvas.jsx';
+import SectionEditor from './SectionEditor.jsx'; // NEW: Section editor modal
 
 const TemplateBuilder = () => {
     const navigate = useNavigate();
-    const [fields, setFields] = useState([]);
+    const [sections, setSections] = useState([]); // CHANGED: Replaced fields with sections
     const [selectedField, setSelectedField] = useState(null);
+    const [selectedSectionId, setSelectedSectionId] = useState(null); // NEW: Track section for field
     const [isEditorOpen, setIsEditorOpen] = useState(false);
+    const [isSectionEditorOpen, setIsSectionEditorOpen] = useState(false); // NEW
     const [templateName, setTemplateName] = useState('');
     const [message, setMessage] = useState('');
-    const [messageType, setMessageType] = useState(''); // 'success' or 'error'
+    const [messageType, setMessageType] = useState('');
 
     const showMessage = (msg, type) => {
         setMessage(msg);
@@ -22,7 +25,18 @@ const TemplateBuilder = () => {
         setTimeout(() => setMessage(''), 3000);
     };
 
-    const handleAddField = (type) => {
+    const handleAddSection = (sectionData) => {
+        const newSection = {
+            id: generateUniqueId(),
+            name: sectionData.name,
+            columns: sectionData.columns,
+            fields: []
+        };
+        setSections(prev => [...prev, newSection]);
+        setIsSectionEditorOpen(false);
+    };
+
+    const handleAddField = (type, sectionId) => {
         const newField = {
             id: generateUniqueId(),
             type,
@@ -31,43 +45,65 @@ const TemplateBuilder = () => {
             required: false,
             options: [],
         };
-        setFields((prevFields) => [...prevFields, newField]);
+        setSections(prevSections =>
+            prevSections.map(sec =>
+                sec.id === sectionId ? { ...sec, fields: [...sec.fields, newField] } : sec
+            )
+        );
         setSelectedField(newField);
+        setSelectedSectionId(sectionId);
         setIsEditorOpen(true);
     };
 
     const handleUpdateField = (updatedField) => {
-        setFields((prevFields) =>
-            prevFields.map((f) => (f.id === updatedField.id ? updatedField : f))
+        setSections(prevSections =>
+            prevSections.map(sec =>
+                sec.id === selectedSectionId
+                    ? {
+                          ...sec,
+                          fields: sec.fields.map(f => (f.id === updatedField.id ? updatedField : f))
+                      }
+                    : sec
+            )
         );
         setSelectedField(null);
         setIsEditorOpen(false);
     };
 
-    const handleDeleteField = (id) => {
-        setFields((prevFields) => prevFields.filter((f) => f.id !== id));
-        if (selectedField && selectedField.id === id) {
+    const handleDeleteField = (fieldId, sectionId) => {
+        setSections(prev =>
+            prev.map(sec =>
+                sec.id === sectionId
+                    ? { ...sec, fields: sec.fields.filter(f => f.id !== fieldId) }
+                    : sec
+            )
+        );
+        if (selectedField && selectedField.id === fieldId) {
             setSelectedField(null);
             setIsEditorOpen(false);
         }
     };
 
-    const handleSelectField = (field) => {
+    const handleSelectField = (field, sectionId) => {
         setSelectedField(field);
+        setSelectedSectionId(sectionId);
         setIsEditorOpen(true);
     };
 
-    const handleSortEnd = (event) => {
+    const handleSortEnd = (sectionId, event) => {
         const { active, over } = event;
         if (active.id !== over.id) {
-            setFields((items) => {
-                const oldIndex = items.findIndex((item) => item.id === active.id);
-                const newIndex = items.findIndex((item) => item.id === over.id);
-                const newItems = [...items];
-                const [movedItem] = newItems.splice(oldIndex, 1);
-                newItems.splice(newIndex, 0, movedItem);
-                return newItems;
-            });
+            setSections(prev =>
+                prev.map(sec => {
+                    if (sec.id !== sectionId) return sec;
+                    const oldIndex = sec.fields.findIndex(f => f.id === active.id);
+                    const newIndex = sec.fields.findIndex(f => f.id === over.id);
+                    const updatedFields = [...sec.fields];
+                    const [moved] = updatedFields.splice(oldIndex, 1);
+                    updatedFields.splice(newIndex, 0, moved);
+                    return { ...sec, fields: updatedFields };
+                })
+            );
         }
     };
 
@@ -76,25 +112,25 @@ const TemplateBuilder = () => {
             showMessage('Template name cannot be empty!', 'error');
             return;
         }
-        if (fields.length === 0) {
-            showMessage('Please add at least one field to the form.', 'error');
+        if (sections.length === 0) {
+            showMessage('Please add at least one section.', 'error');
             return;
         }
 
         try {
-            const existingTemplates = JSON.parse(localStorage.getItem('formTemplates')) || [];
+            const existing = JSON.parse(localStorage.getItem('formTemplates')) || [];
             const newTemplate = {
-                id: generateUniqueId(), // Generate a unique ID for the template itself
+                id: generateUniqueId(),
                 name: templateName,
-                fields: fields,
-                createdAt: new Date().toISOString(), // Use ISO string for timestamp
+                sections,
+                createdAt: new Date().toISOString(),
             };
-            localStorage.setItem('formTemplates', JSON.stringify([...existingTemplates, newTemplate]));
+            localStorage.setItem('formTemplates', JSON.stringify([...existing, newTemplate]));
             showMessage('Template saved successfully!', 'success');
-            navigate('/templates'); // Navigate to templates list after saving
+            navigate('/templates');
         } catch (e) {
-            console.error("Error saving template to local storage: ", e);
-            showMessage('Error saving template. Please try again.', 'error');
+            console.error("Error saving template:", e);
+            showMessage('Error saving template.', 'error');
         }
     };
 
@@ -109,26 +145,37 @@ const TemplateBuilder = () => {
             )}
 
             <div className="flex-grow flex space-x-6">
-                <Sidebar onAddField={handleAddField} />
+                <Sidebar onAddField={(type) => {}} /> {/* no-op, moved into FormCanvas now */}
+
                 <div className="flex-grow flex flex-col bg-white rounded-lg shadow-xl p-6">
-                    <div className="mb-6">
-                        <label htmlFor="templateName" className="block text-lg font-medium text-gray-700 mb-2">Template Name</label>
-                        <input
-                            type="text"
-                            id="templateName"
-                            value={templateName}
-                            onChange={(e) => setTemplateName(e.target.value)}
-                            className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border text-lg"
-                            placeholder="Enter template name"
-                        />
+                    <div className="mb-6 flex justify-between items-center">
+                        <div className="flex-grow">
+                            <label htmlFor="templateName" className="block text-lg font-medium text-gray-700 mb-2">Template Name</label>
+                            <input
+                                type="text"
+                                id="templateName"
+                                value={templateName}
+                                onChange={(e) => setTemplateName(e.target.value)}
+                                className="block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 p-3 border text-lg"
+                                placeholder="Enter template name"
+                            />
+                        </div>
+                        <button
+                            onClick={() => setIsSectionEditorOpen(true)}
+                            className="ml-4 px-4 py-2 bg-indigo-600 text-white font-semibold rounded-md hover:bg-indigo-700"
+                        >
+                            + Add Section
+                        </button>
                     </div>
+
                     <FormCanvas
-                        fields={fields}
+                        sections={sections}
+                        onAddField={handleAddField}
                         onSelectField={handleSelectField}
                         onDeleteField={handleDeleteField}
-                        onDropField={handleAddField}
                         onSortEnd={handleSortEnd}
                     />
+
                     <div className="mt-6 flex justify-end">
                         <button
                             onClick={handleSaveTemplate}
@@ -140,6 +187,7 @@ const TemplateBuilder = () => {
                 </div>
             </div>
 
+            {/* Modals */}
             <Modal isOpen={isEditorOpen} onClose={() => setIsEditorOpen(false)} title="Edit Field Properties">
                 {selectedField && (
                     <FieldEditor
@@ -148,6 +196,13 @@ const TemplateBuilder = () => {
                         onClose={() => setIsEditorOpen(false)}
                     />
                 )}
+            </Modal>
+
+            <Modal isOpen={isSectionEditorOpen} onClose={() => setIsSectionEditorOpen(false)} title="Add New Section">
+                <SectionEditor
+                    onSubmit={handleAddSection}
+                    onCancel={() => setIsSectionEditorOpen(false)}
+                />
             </Modal>
         </div>
     );

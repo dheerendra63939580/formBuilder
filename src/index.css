@@ -1,1 +1,21 @@
 @import "tailwindcss";
+
+.col-count {
+    grid-template-columns: 1;
+}
+
+@media screen and (min-width: 640px) {
+    .col-count {
+        grid-template-columns: repeat(var(--data-col-sm-count), auto);
+    }
+}
+@media screen and (min-width: 768px) {
+    .col-count {
+        grid-template-columns: repeat(var(--data-col-md-count), auto);
+    }
+}
+@media screen and (min-width: 1024px) {
+    .col-count {
+        grid-template-columns: repeat(var(--data-col-lg-count), auto);
+    }
+}

@@ -1,8 +1,8 @@
 // src/pages/FormFillPage.jsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { generateUniqueId } from '../utils/helper.js'; // Corrected extension
-import FormRenderer from './Renderer.jsx'; // Path already correct
+import { generateUniqueId } from '../utils/helper.js';
+import FormRenderer from './Renderer'; // Ensure the correct path
 
 const FormFillPage = () => {
     const { templateId } = useParams();
@@ -22,35 +22,46 @@ const FormFillPage = () => {
         try {
             const storedTemplates = JSON.parse(localStorage.getItem('formTemplates')) || [];
             const foundTemplate = storedTemplates.find(t => t.id === templateId);
-            getPatients();
             if (foundTemplate) {
                 setTemplate(foundTemplate);
+                fetchResidents(foundTemplate);
             } else {
                 showMessage('Template not found.', 'error');
+                setLoading(false);
             }
         } catch (error) {
             console.error("Error fetching template from local storage:", error);
             showMessage('Error loading template.', 'error');
-        } finally {
             setLoading(false);
         }
     }, [templateId]);
-    const getPatients = async()=>{
-       try {
-        const {data} = await fetch("http://localhost:4002/api/v1/get-assigned-residents").then((r)=>r.json());
-        const residents = data.docs.map((i)=>({label: `${i.firstName} ${i.lastName}`, value: i._id}))
-        setTemplate((prev)=>{
-            const newFieds = prev.fields.map((i) => ({
-              ...i,
-              options: i.type == "resident-dropdown" ? residents : i.options,
+
+    const fetchResidents = async (templateData) => {
+        try {
+            const res = await fetch("http://localhost:4002/api/v1/get-assigned-residents");
+            const { data } = await res.json();
+            const residents = data.docs.map((i) => ({
+                label: `${i.firstName} ${i.lastName}`,
+                value: i._id
             }));
-            console.log("newFieds===>", newFieds);  
-            return  {...prev, fields: newFieds}
-        })
-       } catch (error) {
-        console.log(error)
-       }
-    }
+
+            // Update only resident-dropdown fields inside sections
+            const updatedSections = templateData.sections.map(section => ({
+                ...section,
+                fields: section.fields.map(field => ({
+                    ...field,
+                    options: field.type === 'resident-dropdown' ? residents : field.options
+                }))
+            }));
+
+            setTemplate({ ...templateData, sections: updatedSections });
+        } catch (error) {
+            console.error("Error fetching residents:", error);
+            showMessage('Error fetching resident list.', 'error');
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleSubmitForm = (formData) => {
         try {
@@ -58,7 +69,7 @@ const FormFillPage = () => {
             const formsForTemplate = allSavedForms[templateId] || [];
 
             const newFormData = {
-                id: generateUniqueId(), // Unique ID for each submitted form
+                id: generateUniqueId(),
                 templateId: templateId,
                 data: formData,
                 submittedAt: new Date().toISOString(),
@@ -66,8 +77,9 @@ const FormFillPage = () => {
 
             allSavedForms[templateId] = [...formsForTemplate, newFormData];
             localStorage.setItem('savedForms', JSON.stringify(allSavedForms));
+
             showMessage('Form submitted successfully!', 'success');
-            navigate(`/saved-forms/${templateId}`); // Navigate to saved forms list
+            navigate(`/saved-forms/${templateId}`);
         } catch (e) {
             console.error("Error submitting form data to local storage: ", e);
             showMessage('Error submitting form. Please try again.', 'error');
