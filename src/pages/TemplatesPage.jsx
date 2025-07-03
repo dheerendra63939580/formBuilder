@@ -62,50 +62,7 @@ const TemplatesPage = () => {
                     </button>
                 </div>
             ) : (
-                <div className="overflow-x-auto rounded-lg p-6 flex gap-2.5">
-                    {/* <table className="min-w-full divide-y divide-gray-200">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Template Name
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Created At
-                                </th>
-                                <th scope="col" className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                                    Actions
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="bg-white divide-y divide-gray-200">
-                            {templates.map((template) => (
-                                <tr key={template.id}>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                        {template.name}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                        {template.createdAt ? new Date(template.createdAt).toLocaleString() : 'N/A'}
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                                        <div className="flex justify-center space-x-3">
-                                            <button
-                                                onClick={() => navigate(`/fill-form/${template.id}`)}
-                                                className="text-blue-600 hover:text-blue-900 px-3 py-1 rounded-md border border-blue-600 hover:bg-blue-50 transition-colors"
-                                            >
-                                                Fill Form
-                                            </button>
-                                            <button
-                                                onClick={() => navigate(`/saved-forms/${template.id}`)}
-                                                className="text-purple-600 hover:text-purple-900 px-3 py-1 rounded-md border border-purple-600 hover:bg-purple-50 transition-colors"
-                                            >
-                                                View Saved Forms
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>                      
-                    </table> */}
+                <div className="rounded-lg p-6 grid grid-cols-4 gap-4">
                     {templates.map((template) => (
                         <div 
                             key={template.id} 

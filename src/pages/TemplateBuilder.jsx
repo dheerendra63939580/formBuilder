@@ -35,6 +35,10 @@ const TemplateBuilder = () => {
         setSections(prev => [...prev, newSection]);
         setIsSectionEditorOpen(false);
     };
+    const handleDeleteSection = (sectionId) => {
+        const newSections = sections.filter((value) => value.id !== sectionId)
+        setSections([...newSections])
+    }
 
     const handleAddField = (type, sectionId) => {
         const newField = {
@@ -133,7 +137,7 @@ const TemplateBuilder = () => {
             showMessage('Error saving template.', 'error');
         }
     };
-
+    console.log(sections)
     return (
         <div className="flex flex-col min-h-screen bg-gray-50 p-6 font-inter">
             <h1 className="text-3xl font-extrabold text-gray-900 mb-8 text-center">Form Template Builder</h1>
@@ -174,6 +178,7 @@ const TemplateBuilder = () => {
                         onSelectField={handleSelectField}
                         onDeleteField={handleDeleteField}
                         onSortEnd={handleSortEnd}
+                        handleDeleteSection={handleDeleteSection}
                     />
 
                     <div className="mt-6 flex justify-end">

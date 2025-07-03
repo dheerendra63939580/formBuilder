@@ -2,7 +2,7 @@
 import React from 'react';
 import Section from './Section';
 
-const FormCanvas = ({ sections, onAddField, onSelectField, onDeleteField, onSortEnd }) => {
+const FormCanvas = ({ sections, onAddField, onSelectField, onDeleteField, onSortEnd, handleDeleteSection }) => {
     return (
         <div className="flex-grow p-8 bg-gray-100 rounded-lg shadow-inner border-2 border-dashed border-gray-300 min-h-[600px] overflow-auto">
             {sections.length === 0 ? (
@@ -16,6 +16,7 @@ const FormCanvas = ({ sections, onAddField, onSelectField, onDeleteField, onSort
                         onSelectField={onSelectField}
                         onDeleteField={onDeleteField}
                         onSortEnd={onSortEnd}
+                        handleDeleteSection={handleDeleteSection}
                     />
                 ))
             )}
