@@ -18,7 +18,8 @@ const TemplateBuilder = () => {
     const [templateName, setTemplateName] = useState('');
     const [message, setMessage] = useState('');
     const [messageType, setMessageType] = useState('');
-
+    const [isEditSection, setIsEditSection] = useState(false);
+    const [editSectionData, setEditSectionData] = useState({})
     const showMessage = (msg, type) => {
         setMessage(msg);
         setMessageType(type);
@@ -35,9 +36,20 @@ const TemplateBuilder = () => {
         setSections(prev => [...prev, newSection]);
         setIsSectionEditorOpen(false);
     };
+    const handleEditSection = (sectionData) => {
+        setSections(prev => prev.map((value) => value.id === editSectionData.id ? {...value, name: sectionData.name, columns: sectionData.columns}: value));
+        setIsSectionEditorOpen(false);
+        setIsEditSection(false);
+        setEditSectionData({})
+    };
     const handleDeleteSection = (sectionId) => {
         const newSections = sections.filter((value) => value.id !== sectionId)
         setSections([...newSections])
+    }
+    const handleEditSectionModalOpen = (sectionId) => {
+        setIsSectionEditorOpen(true);
+        setIsEditSection(true);
+        setEditSectionData(sections.find((value) => value.id === sectionId))
     }
 
     const handleAddField = (type, sectionId) => {
@@ -179,6 +191,8 @@ const TemplateBuilder = () => {
                         onDeleteField={handleDeleteField}
                         onSortEnd={handleSortEnd}
                         handleDeleteSection={handleDeleteSection}
+                        handleEditSectionModalOpen={handleEditSectionModalOpen}
+                        handleEditSection={handleEditSection}
                     />
 
                     <div className="mt-6 flex justify-end">
@@ -203,10 +217,12 @@ const TemplateBuilder = () => {
                 )}
             </Modal>
 
-            <Modal isOpen={isSectionEditorOpen} onClose={() => setIsSectionEditorOpen(false)} title="Add New Section">
+            <Modal isOpen={isSectionEditorOpen} onClose={() => setIsSectionEditorOpen(false)} title={isEditSection ? "Edit Section" : "Add New Section"}>
                 <SectionEditor
-                    onSubmit={handleAddSection}
+                    onSubmit={isEditSection ? handleEditSection : handleAddSection}
                     onCancel={() => setIsSectionEditorOpen(false)}
+                    isEditSection={isEditSection}
+                    editSectionData = {editSectionData}
                 />
             </Modal>
         </div>

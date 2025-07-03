@@ -1,9 +1,10 @@
 // src/components/SectionEditor.jsx
 import React, { useState } from 'react';
 
-const SectionEditor = ({ onSubmit, onCancel }) => {
-    const [name, setName] = useState('');
-    const [columns, setColumns] = useState({ sm: 1, md: 2, lg: 3 });
+const SectionEditor = ({ onSubmit, onCancel, isEditSection = false, editSectionData }) => {
+    console.log(editSectionData)
+    const [name, setName] = useState(isEditSection ? editSectionData.name : "");
+    const [columns, setColumns] = useState(isEditSection ? editSectionData.columns : { sm: 1, md: 2, lg: 3 });
 
     const handleSubmit = () => {
         onSubmit({ name, columns });
@@ -37,7 +38,7 @@ const SectionEditor = ({ onSubmit, onCancel }) => {
             </div>
             <div className="flex justify-end space-x-4">
                 <button onClick={onCancel} className="px-4 py-2 bg-gray-200 rounded">Cancel</button>
-                <button onClick={handleSubmit} className="px-4 py-2 bg-blue-600 text-white rounded">Add Section</button>
+                <button onClick={handleSubmit} className="px-4 py-2 bg-blue-600 text-white rounded">{isEditSection ? "Update Section" : "Add Section"}</button>
             </div>
         </div>
     );

@@ -12,7 +12,7 @@ import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable'
 import { sortableKeyboardCoordinates } from '@dnd-kit/sortable';
 import FieldItem from './FieldItem';
 
-const Section = ({ section, onAddField, onSelectField, onDeleteField, onSortEnd, handleDeleteSection }) => {
+const Section = ({ section, onAddField, onSelectField, onDeleteField, onSortEnd, handleDeleteSection, handleEditSectionModalOpen }) => {
     const sensors = useSensors(
         useSensor(PointerSensor),
         useSensor(KeyboardSensor, {
@@ -35,10 +35,17 @@ const Section = ({ section, onAddField, onSelectField, onDeleteField, onSortEnd,
             onDrop={handleDrop}
         >
             <h2 className="text-xl font-semibold text-gray-700 mb-4">{section.name}</h2>
-            <button type="button" className="bg-red-500 p-2 text-white absolute right-3 top-3 cursor-pointer" onClick={() => handleDeleteSection(section.id)}
-            >
-                Delete
-            </button>
+            <div className='absolute right-3 top-3 flex gap-2.5'>
+                
+                <button type="button" className="bg-blue-500 p-2 text-white cursor-pointer" onClick={() => handleEditSectionModalOpen(section.id)}
+                >
+                    Edit
+                </button>
+                <button type="button" className="bg-red-500 p-2 text-white cursor-pointer" onClick={() => handleDeleteSection(section.id)}
+                >
+                    Delete
+                </button>
+            </div>
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={(event) => onSortEnd(section.id, event)}>
                 <SortableContext items={section.fields.map(f => f.id)} strategy={verticalListSortingStrategy}>
                     <div
