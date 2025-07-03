@@ -7,6 +7,7 @@ import FieldEditor from './FieldEditor.jsx';
 import Sidebar from './Sidebar.jsx';
 import FormCanvas from './FormCanvas.jsx';
 import SectionEditor from './SectionEditor.jsx'; // NEW: Section editor modal
+import Renderer from "./Renderer.jsx"
 
 const TemplateBuilder = () => {
     const navigate = useNavigate();
@@ -19,7 +20,8 @@ const TemplateBuilder = () => {
     const [message, setMessage] = useState('');
     const [messageType, setMessageType] = useState('');
     const [isEditSection, setIsEditSection] = useState(false);
-    const [editSectionData, setEditSectionData] = useState({})
+    const [editSectionData, setEditSectionData] = useState({});
+    const [isPreview, setIsPreview] = useState(false);
     const showMessage = (msg, type) => {
         setMessage(msg);
         setMessageType(type);
@@ -149,7 +151,11 @@ const TemplateBuilder = () => {
             showMessage('Error saving template.', 'error');
         }
     };
-    console.log(sections)
+    
+    const handlePreview = () => {
+        setIsPreview(!isPreview)
+    }
+
     return (
         <div className="flex flex-col min-h-screen bg-gray-50 p-6 font-inter">
             <h1 className="text-3xl font-extrabold text-gray-900 mb-8 text-center">Form Template Builder</h1>
@@ -161,7 +167,9 @@ const TemplateBuilder = () => {
             )}
 
             <div className="flex-grow flex space-x-6">
-                <Sidebar onAddField={(type) => {}} /> {/* no-op, moved into FormCanvas now */}
+                <div>
+                    <Sidebar onAddField={(type) => {}} />                       
+                </div>
 
                 <div className="flex-grow flex flex-col bg-white rounded-lg shadow-xl p-6 relative">
                     <div className="mb-6 flex">
@@ -195,7 +203,13 @@ const TemplateBuilder = () => {
                         handleEditSection={handleEditSection}
                     />
 
-                    <div className="mt-6 flex justify-end">
+                    <div className="mt-6 flex justify-end gap-4">
+                        <button
+                            onClick={handlePreview}
+                            className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold rounded-lg shadow-lg hover:from-blue-600 hover:to-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 transition transform hover:scale-105"
+                        >
+                            Preview
+                        </button>
                         <button
                             onClick={handleSaveTemplate}
                             className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-700 text-white font-semibold rounded-lg shadow-lg hover:from-blue-600 hover:to-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 transition transform hover:scale-105"
@@ -223,6 +237,19 @@ const TemplateBuilder = () => {
                     onCancel={() => setIsSectionEditorOpen(false)}
                     isEditSection={isEditSection}
                     editSectionData = {editSectionData}
+                />
+            </Modal>
+            <Modal isOpen={isPreview} onClose={handlePreview} title="Preview">
+                <Renderer
+                    template={{
+                        id: generateUniqueId(),
+                        name: templateName,
+                        sections,
+                        createdAt: new Date().toISOString(),
+                    }}
+                    mode="create"
+                    onSubmit={handlePreview}
+                    isPreview={isPreview}
                 />
             </Modal>
         </div>

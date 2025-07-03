@@ -36,7 +36,7 @@ const SectionEditor = ({ onSubmit, onCancel, isEditSection = false, editSectionD
                     </div>
                 ))}
             </div>
-            <div className="flex justify-end space-x-4">
+            <div className="flex justify-end space-x-4 [&>button]:cursor-pointer">
                 <button onClick={onCancel} className="px-4 py-2 bg-gray-200 rounded">Cancel</button>
                 <button onClick={handleSubmit} className="px-4 py-2 bg-blue-600 text-white rounded">{isEditSection ? "Update Section" : "Add Section"}</button>
             </div>

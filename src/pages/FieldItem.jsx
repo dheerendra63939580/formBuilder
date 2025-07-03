@@ -17,7 +17,7 @@ const FieldItem = ({ field, onSelectField, onDeleteField }) => {
             style={style}
             className="flex items-center justify-between p-4 mb-3 bg-white rounded-lg shadow-md border border-gray-200 hover:border-blue-400 transition duration-200 ease-in-out cursor-grab"
         >
-            <div className="flex-grow" onClick={() => onSelectField(field)}>
+            <div className="flex-grow" >
                 <p className="font-semibold text-gray-800">{field.label || `Untitled ${field.type}`}</p>
                 <p className="text-sm text-gray-500">Type: {field.type}</p>
             </div>

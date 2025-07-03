@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const FormRenderer = ({ template, mode, initialData = {}, onSubmit }) => {
+const FormRenderer = ({ template, mode, initialData = {}, onSubmit, isPreview=false }) => {
     const [formData, setFormData] = useState({});
     const [errors, setErrors] = useState({});
     const navigate = useNavigate();
@@ -191,7 +191,7 @@ const FormRenderer = ({ template, mode, initialData = {}, onSubmit }) => {
                     </div>)
                 })}
 
-                {mode !== 'view' && (
+                {mode !== 'view' && !isPreview && (
                     <div className="flex justify-end pt-4">
                         <button
                             type="submit"
@@ -201,7 +201,7 @@ const FormRenderer = ({ template, mode, initialData = {}, onSubmit }) => {
                         </button>
                     </div>
                 )}
-                <div className="flex justify-center mt-4">
+                {!isPreview && <div className="flex justify-center mt-4">
                     <button
                         type="button"
                         onClick={() => navigate(-1)}
@@ -209,7 +209,7 @@ const FormRenderer = ({ template, mode, initialData = {}, onSubmit }) => {
                     >
                         Back
                     </button>
-                </div>
+                </div> }
             </form>
         </div>
     );

@@ -12,7 +12,7 @@ const Sidebar = ({ onAddField }) => {
     ];
 
     return (
-        <div className="w-64 bg-gray-50 p-6 border-r border-gray-200 shadow-lg rounded-lg">
+        <div className="w-64 bg-gray-50 p-6 border-r border-gray-200 shadow-lg rounded-lg sticky top-0 left-0">
             <h2 className="text-xl font-bold mb-6 text-gray-800">Field Types</h2>
             <div className="space-y-4">
                 {fieldTypes.map((type) => (

@@ -30,26 +30,27 @@ const Section = ({ section, onAddField, onSelectField, onDeleteField, onSortEnd,
 
     return (
         <div
-            className="mb-6 p-4 border border-gray-300 rounded bg-white shadow-sm relative min-h-24"
+            className="p-4 border border-gray-300 rounded bg-white shadow-sm min-h-24"
             onDragOver={(e) => e.preventDefault()}
             onDrop={handleDrop}
         >
-            <h2 className="text-xl font-semibold text-gray-700 mb-4">{section.name}</h2>
-            <div className='absolute right-3 top-3 flex gap-2.5'>
-                
-                <button type="button" className="bg-blue-500 p-2 text-white cursor-pointer" onClick={() => handleEditSectionModalOpen(section.id)}
-                >
-                    Edit
-                </button>
-                <button type="button" className="bg-red-500 p-2 text-white cursor-pointer" onClick={() => handleDeleteSection(section.id)}
-                >
-                    Delete
-                </button>
+            <div className={`flex items-start ${section?.name?.length > 0 ? "justify-between" : "justify-end"}`}>
+                {section?.name?.length > 0 && <h2 className="text-xl font-semibold text-gray-700 mb-4">{section.name}</h2>}
+                <div className='flex gap-2.5 mb-4 [&>button]:rounded-lg [&>button]:text-white [&>button]:cursor-pointer [&>button]:p-1'>         
+                    <button type="button" className="bg-blue-500" onClick={() => handleEditSectionModalOpen(section.id)}
+                    >
+                        Edit
+                    </button>
+                    <button type="button" className="bg-red-500" onClick={() => handleDeleteSection(section.id)}
+                    >
+                        Delete
+                    </button>
+                </div>
             </div>
             <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={(event) => onSortEnd(section.id, event)}>
                 <SortableContext items={section.fields.map(f => f.id)} strategy={verticalListSortingStrategy}>
                     <div
-                        className={`grid gap-4 grid-cols-${section.columns.sm} sm:grid-cols-${section.columns.sm} md:grid-cols-${section.columns.md} lg:grid-cols-${section.columns.lg}`}
+                        className={`grid gap-4`}
                     >
                         {section.fields.map((field) => (
                             <FieldItem
