@@ -127,7 +127,7 @@ const TemplateBuilder = () => {
             };
             localStorage.setItem('formTemplates', JSON.stringify([...existing, newTemplate]));
             showMessage('Template saved successfully!', 'success');
-            navigate('/templates');
+            navigate('/');
         } catch (e) {
             console.error("Error saving template:", e);
             showMessage('Error saving template.', 'error');

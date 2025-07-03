@@ -6,7 +6,6 @@ const SectionEditor = ({ onSubmit, onCancel }) => {
     const [columns, setColumns] = useState({ sm: 1, md: 2, lg: 3 });
 
     const handleSubmit = () => {
-        if (!name.trim()) return;
         onSubmit({ name, columns });
     };
 
@@ -22,15 +21,15 @@ const SectionEditor = ({ onSubmit, onCancel }) => {
                 />
             </div>
             <div className="grid grid-cols-3 gap-4">
-                {['sm', 'md', 'lg'].map((size) => (
-                    <div key={size}>
-                        <label className="block text-sm font-medium">Columns ({size})</label>
+                {[{value: 'sm', name: "For Mobile"}, {value: 'md', name: "For tabs"}, {value: 'lg', name: "For large screen"}].map((size) => (
+                    <div key={size.value}>
+                        <label className="block text-sm font-medium">Columns ({size.name})</label>
                         <input
                             type="number"
                             min={1}
                             max={6}
-                            value={columns[size]}
-                            onChange={(e) => setColumns({ ...columns, [size]: parseInt(e.target.value) })}
+                            value={columns[size.value]}
+                            onChange={(e) => setColumns({ ...columns, [size.value]: parseInt(e.target.value) })}
                             className="w-full mt-1 p-2 border rounded"
                         />
                     </div>

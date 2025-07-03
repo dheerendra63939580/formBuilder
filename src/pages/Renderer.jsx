@@ -77,7 +77,7 @@ const FormRenderer = ({ template, mode, initialData = {}, onSubmit }) => {
                 {template.sections.map((section) => {
                     return (
                     <div key={section.id} className="mb-8">
-                        <h3 className="text-xl font-bold text-gray-800 mb-4">{section.name}</h3>
+                        {section.name.length > 0 ? <h3 className="text-xl font-bold text-gray-800 mb-4">{section.name}</h3> : null}
                         <div className={`grid gap-6 col-count`}
                             style={{"--data-col-sm-count": section.columns.sm, "--data-col-md-count": section.columns.md, "--data-col-lg-count": section.columns.lg}}
                         >
@@ -126,10 +126,11 @@ const FormRenderer = ({ template, mode, initialData = {}, onSubmit }) => {
                                         </select>
                                     )}
                                     {field.type === 'checkbox' && (
-                                        <div className="mt-2 space-y-2">
+                                        <div className="mt-2 flex gap-4 items-center">
                                             {field.options && field.options.map((option, index) => (
-                                                <label key={index} className="flex items-center text-gray-700">
+                                                <div className='flex items-center' key={option.id}>
                                                     <input
+                                                        id={`${option}-${index}`}
                                                         type="checkbox"
                                                         name={field.id}
                                                         value={option}
@@ -138,16 +139,19 @@ const FormRenderer = ({ template, mode, initialData = {}, onSubmit }) => {
                                                         className="h-4 w-4 text-blue-600 border-gray-300 rounded mr-2"
                                                         disabled={mode === 'view'}
                                                     />
-                                                    {option}
-                                                </label>
+                                                    <label htmlFor={`${option}-${index}`} className="text-gray-700">
+                                                        {option}
+                                                    </label>
+                                                </div>
                                             ))}
                                         </div>
                                     )}
                                     {field.type === 'radio' && (
-                                        <div className="mt-2 space-y-2">
+                                        <div className="mt-2 flex items-center gap-4">
                                             {field.options && field.options.map((option, index) => (
-                                                <label key={index} className="flex items-center text-gray-700">
+                                                <div className='flex items-center'key={option.id}>
                                                     <input
+                                                        id={`${option}-${index}`}
                                                         type="radio"
                                                         name={field.id}
                                                         value={option}
@@ -156,8 +160,10 @@ const FormRenderer = ({ template, mode, initialData = {}, onSubmit }) => {
                                                         className="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500 mr-2"
                                                         disabled={mode === 'view'}
                                                     />
-                                                    {option}
-                                                </label>
+                                                    <label htmlFor={`${option}-${index}`} className="flex items-center text-gray-700">              
+                                                        {option}
+                                                    </label>
+                                                </div>
                                             ))}
                                         </div>
                                     )}
@@ -197,6 +203,7 @@ const FormRenderer = ({ template, mode, initialData = {}, onSubmit }) => {
                 )}
                 <div className="flex justify-center mt-4">
                     <button
+                        type="button"
                         onClick={() => navigate(-1)}
                         className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 transition-colors"
                     >
